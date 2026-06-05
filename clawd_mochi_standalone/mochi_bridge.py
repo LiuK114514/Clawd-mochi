@@ -59,12 +59,19 @@ def find_port():
 
 
 def send_cmd(port: str, cmd: str, wait_ms: int = 50) -> str:
-    with serial.Serial(port, 115200, timeout=3) as ser:
-        ser.write((cmd + "\n").encode())
+    s = serial.Serial()
+    s.port = port
+    s.baudrate = 115200
+    s.timeout = 3
+    s.dtr = False   # 防止 DTR/RTS 跳变导致 ESP32 复位
+    s.rts = False
+    s.open()
+    with s:
+        s.write((cmd + "\n").encode())
         time.sleep(wait_ms / 1000)
-        resp = ser.readline().decode().strip()
+        resp = s.readline().decode().strip()
         # 读干净剩余 OK
-        extra = ser.readline().decode().strip()
+        extra = s.readline().decode().strip()
         if extra and not resp:
             resp = extra
         return resp
