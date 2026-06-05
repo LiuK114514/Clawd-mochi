@@ -85,12 +85,6 @@ int  autoCycleSec = 10;
 bool btnWasPressed = false;
 bool btnState = HIGH;
 
-// ── Serial / Claude Code mode ─────────────────────────────────
-bool claudeMode = false;
-char statusMsg[48] = "";
-int8_t thinkDotPhase = 0;
-unsigned long thinkDotMs = 0;
-
 // ── Mochi Pixel Pet state ──────────────────────────────────────
 #define PET_CY 202
 #define PET_R  22
@@ -231,6 +225,7 @@ void initColours() {
 
 uint16_t bgColour()       { return C_BG; }
 void     setBg(uint16_t c){ C_BG = c; }
+static void fillBg(uint16_t c) { tft.fillScreen(c); }
 
 uint16_t hueToRgb565(uint8_t h) {
   uint8_t r, g, b;
@@ -959,6 +954,7 @@ void updateThinkingEyes() {
   tft.fillCircle(rx + EYE_W + 6, cy + 8, 5, tft.color565(200, 100, 80));
 
   // "..." 弹跳动画
+  static int8_t thinkDotPhase = 0;
   thinkDotPhase = (thinkDotPhase + 1) % 4;
   int16_t bounceY[4] = {0, -4, 0, 0};
   for (uint8_t i = 0; i < 3; i++) {
@@ -966,98 +962,6 @@ void updateThinkingEyes() {
     int16_t dy = (i == thinkDotPhase % 3) ? bounceY[thinkDotPhase] : 0;
     tft.fillCircle(120 + dx, 185 + dy, 4, C_MUTED);
     tft.fillCircle(120 + dx, 185 + dy - 1, 3, tft.color565(120, 118, 116));
-  }
-}
-
-// ── Serial Command Handler ───────────────────────────────────
-static void fillBg(uint16_t c) {
-  tft.fillScreen(c);
-}
-
-void drawStatusOverlay() {
-  if (statusMsg[0] == '\0') return;
-  // 半透明效果用深色半高条代替（ST7789 不支持真正透明）
-  tft.fillRect(0, 210, DISP_W, 30, tft.color565(10, 12, 16));
-  tft.setTextColor(C_WHITE); tft.setTextSize(1);
-  tft.setCursor(10, 218);
-  tft.print(statusMsg);
-}
-
-int8_t exprFromName(const char* name) {
-  if (strcmp(name, "normal") == 0)    return VIEW_EYES_NORMAL;
-  if (strcmp(name, "squish") == 0)    return VIEW_EYES_SQUISH;
-  if (strcmp(name, "happy") == 0)     return VIEW_EYES_HAPPY;
-  if (strcmp(name, "surprised") == 0) return VIEW_EYES_SURPRISED;
-  if (strcmp(name, "heart") == 0)     return VIEW_EYES_HEART;
-  if (strcmp(name, "sleepy") == 0)    return VIEW_EYES_SLEEPY;
-  if (strcmp(name, "wink") == 0)      return VIEW_EYES_WINK;
-  if (strcmp(name, "angry") == 0)     return VIEW_EYES_ANGRY;
-  if (strcmp(name, "cry") == 0)       return VIEW_EYES_CRY;
-  if (strcmp(name, "sweat") == 0)     return VIEW_EYES_SWEAT;
-  if (strcmp(name, "drool") == 0)     return VIEW_EYES_DROOL;
-  if (strcmp(name, "blush") == 0)     return VIEW_EYES_BLUSH;
-  if (strcmp(name, "jealous") == 0)   return VIEW_EYES_JEALOUS;
-  if (strcmp(name, "roll") == 0)      return VIEW_EYES_ROLL;
-  if (strcmp(name, "explode") == 0)   return VIEW_EYES_EXPLODE;
-  if (strcmp(name, "devil") == 0)     return VIEW_EYES_DEVIL;
-  if (strcmp(name, "sick") == 0)      return VIEW_EYES_SICK;
-  if (strcmp(name, "pet") == 0)       return VIEW_PET;
-  if (strcmp(name, "thinking") == 0)  return VIEW_EYES_THINK;
-  return -1;
-}
-
-void handleSerial() {
-  if (Serial.available() <= 0) return;
-
-  char buf[64];
-  size_t len = Serial.readBytesUntil('\n', buf, 63);
-  buf[len] = '\0';
-  // 去掉末尾回车
-  while (len > 0 && (buf[len-1] == '\r' || buf[len-1] == '\n')) buf[--len] = '\0';
-  if (len == 0) return;
-
-  if (strcmp(buf, "PING") == 0) {
-    Serial.println("OK");
-    return;
-  }
-
-  if (strncmp(buf, "EXPR:", 5) == 0) {
-    int8_t v = exprFromName(buf + 5);
-    if (v >= 0) {
-      enterView((uint8_t)v);
-      drawStatusOverlay();
-    }
-    Serial.println("OK");
-    return;
-  }
-
-  if (strncmp(buf, "TEXT:", 5) == 0) {
-    strncpy(statusMsg, buf + 5, 47);
-    statusMsg[47] = '\0';
-    drawStatusOverlay();
-    Serial.println("OK");
-    return;
-  }
-
-  if (strcmp(buf, "CLEAR") == 0) {
-    statusMsg[0] = '\0';
-    tft.fillRect(0, 210, DISP_W, 30, bgColour());
-    Serial.println("OK");
-    return;
-  }
-
-  if (strncmp(buf, "MODE:", 5) == 0) {
-    claudeMode = (strcmp(buf + 5, "claude") == 0);
-    Serial.println("OK");
-    return;
-  }
-
-  if (strcmp(buf, "STATUS") == 0) {
-    Serial.print("VIEW="); Serial.print(currentView);
-    Serial.print(" MODE="); Serial.print(claudeMode ? "claude" : "normal");
-    Serial.print(" TEXT="); Serial.println(statusMsg);
-    Serial.println("OK");
-    return;
   }
 }
 
@@ -1069,9 +973,9 @@ void updateNormalEyes() {
   // 眨眼间隔从 3s 改为 5s，眨眼动作放慢
   if (millis() - lastAnimMs > 5000) {
     lastAnimMs = millis();
-    drawNormalEyes(0, true);  drawStatusOverlay(); delay(120);
-    drawNormalEyes(0, false); drawStatusOverlay(); delay(100);
-    drawNormalEyes(0, true);  drawStatusOverlay(); delay(120);
+    drawNormalEyes(0, true);  delay(120);
+    drawNormalEyes(0, false); delay(100);
+    drawNormalEyes(0, true);  delay(120);
     drawNormalEyes(0, false);
     return;
   }
@@ -1079,7 +983,7 @@ void updateNormalEyes() {
     lastAnimMs = millis();
     const int16_t offs[] = {-16, 16, -16, 16, 0};
     for (uint8_t i = 0; i < 5; i++) {
-      drawNormalEyes(offs[i]); drawStatusOverlay();
+      drawNormalEyes(offs[i]);
       delay(80);
     }
   }
@@ -1089,8 +993,8 @@ void updateSquishEyes() {
   if (millis() - lastAnimMs > 3500) {
     lastAnimMs = millis();
     for (uint8_t i = 0; i < 2; i++) {
-      drawSquishEyes(false); drawStatusOverlay(); delay(140);
-      drawSquishEyes(true);  drawStatusOverlay(); delay(100);
+      drawSquishEyes(false); delay(140);
+      drawSquishEyes(true);  delay(100);
     }
     drawSquishEyes(false);
   }
@@ -1099,9 +1003,9 @@ void updateSquishEyes() {
 void updateHappyEyes() {
   if (millis() - lastAnimMs > 5000) {
     lastAnimMs = millis();
-    drawHappyEyes(true);   drawStatusOverlay(); delay(200);
-    drawHappyEyes(false);  drawStatusOverlay(); delay(100);
-    drawHappyEyes(true);   drawStatusOverlay(); delay(150);
+    drawHappyEyes(true);   delay(200);
+    drawHappyEyes(false);  delay(100);
+    drawHappyEyes(true);   delay(150);
     drawHappyEyes(false);
   }
 }
@@ -1114,7 +1018,7 @@ void updateSurprisedEyes() {
     const int16_t cx = EYE_W / 2, cy = EYE_H / 2;
     tft.fillCircle(lx + cx, ey + cy, EYE_W * 3 / 5, C_BLACK);
     tft.fillCircle(rx + cx, ey + cy, EYE_W * 3 / 5, C_BLACK);
-    drawStatusOverlay(); delay(120);
+    delay(120);
     drawSurprisedEyes();
   }
 }
@@ -1135,7 +1039,7 @@ void updateHeartEyes() {
       tft.fillCircle(hcx - 7, hcy - 2, 8, hc);
       tft.fillCircle(hcx + 7, hcy - 2, 8, hc);
       tft.fillTriangle(hcx - 14, hcy, hcx + 14, hcy, hcx, hcy + 15, hc);
-      drawStatusOverlay(); delay(60);
+      delay(60);
     }
     drawHeartEyes();
   }
@@ -1150,7 +1054,7 @@ void updateSleepyEyes() {
       sleepLevel += 8;
       if (sleepLevel >= 255) {
         waking = true;
-        drawStatusOverlay(); delay(400);
+        delay(400);
       }
     } else {
       sleepLevel -= 20;
@@ -1167,9 +1071,9 @@ void updateSleepyEyes() {
 void updateWinkEyes() {
   if (millis() - lastAnimMs > 2500) {
     lastAnimMs = millis();
-    drawWinkEyes(true);   drawStatusOverlay(); delay(150);
-    drawWinkEyes(false);  drawStatusOverlay(); delay(80);
-    drawWinkEyes(true);   drawStatusOverlay(); delay(100);
+    drawWinkEyes(true);   delay(150);
+    drawWinkEyes(false);  delay(80);
+    drawWinkEyes(true);   delay(100);
     drawWinkEyes(false);
   }
 }
@@ -1178,7 +1082,7 @@ void updateAngryEyes() {
   if (millis() - lastAnimMs > 3000) {
     lastAnimMs = millis();
     for (uint8_t i = 0; i < 4; i++) {
-      drawAngryEyes(); drawStatusOverlay();
+      drawAngryEyes();
       delay(200);
     }
   }
@@ -1188,7 +1092,7 @@ void updateCryEyes() {
   // 眼泪偶尔"刷新"（模拟流泪）
   if (millis() - lastAnimMs > 4000) {
     lastAnimMs = millis();
-    drawCryEyes(); drawStatusOverlay();
+    drawCryEyes();
     delay(150);
     // 再画一遍让眼泪"流下"
     fillBg(bgColour());
@@ -1214,7 +1118,7 @@ void updateCryEyes() {
       tft.drawLine(128, MOUTH_Y - 3 + t, 138, MOUTH_Y + 1 + t, C_BLACK);
       tft.drawLine(138, MOUTH_Y + 1 + t, 142, MOUTH_Y + t, C_BLACK);
     }
-    drawStatusOverlay(); delay(200);
+    delay(200);
     drawCryEyes();
   }
 }
@@ -1260,7 +1164,7 @@ void updateRollEyes() {
 void updateExplodeEyes() {
   if (millis() - lastAnimMs > 2000) {
     lastAnimMs = millis();
-    drawExplodeEyes(); drawStatusOverlay();
+    drawExplodeEyes();
     delay(150);
     drawExplodeEyes();
   }
@@ -1319,7 +1223,6 @@ void enterView(uint8_t v) {
       drawPetScene();
       break;
   }
-  if (statusMsg[0] != '\0') drawStatusOverlay();
 }
 
 void nextView() {
@@ -1375,8 +1278,6 @@ void handleButton() {
 // ═════════════════════════════════════════════════════════════
 
 void setup() {
-  Serial.begin(115200);
-
   pinMode(BTN_PIN, INPUT_PULLUP);
   pinMode(TFT_BLK, OUTPUT);
   setBacklight(true);
@@ -1406,12 +1307,10 @@ void setup() {
 
 void loop() {
   handleButton();
-  handleSerial();
 
   const unsigned long now = millis();
 
-  // claudeMode 下禁用自动轮播，完全由串口控制
-  if (!claudeMode && backlightOn && currentView >= VIEW_EYES_NORMAL && now - lastCycleMs > (unsigned long)autoCycleSec * 1000) {
+  if (backlightOn && currentView >= VIEW_EYES_NORMAL && now - lastCycleMs > (unsigned long)autoCycleSec * 1000) {
     lastCycleMs = now;
     nextView();
     return;
@@ -1441,8 +1340,4 @@ void loop() {
     case VIEW_PET:            updatePet();           break;
   }
 
-  // 状态栏叠加（每帧保持，不被表情刷新覆盖）
-  if (statusMsg[0] != '\0') {
-    drawStatusOverlay();
-  }
 }
