@@ -222,7 +222,7 @@ void setBacklight(bool on) {
 }
 
 void initColours() {
-  C_ORANGE = tft.color565(218, 17, 0);
+  C_ORANGE = tft.color565(255, 140, 40);
   C_DARKBG = tft.color565(10,  12,  16);
   C_MUTED  = tft.color565(90,  88,  86);
   C_GREEN  = tft.color565(80, 220, 130);
@@ -275,7 +275,7 @@ void drawLogoFilled(uint16_t bg, uint16_t fg) {
 }
 
 void animLogoReveal() {
-  tft.fillScreen(bgColour());
+  fillBg(bgColour());
   for (uint16_t i = 0; i < LOGO_SEG_COUNT; i++) {
     int16_t x1 = pgm_read_word(&LOGO_SEGS[i][0]);
     int16_t y1 = pgm_read_word(&LOGO_SEGS[i][1]);
@@ -306,7 +306,7 @@ inline int16_t eyeCY()           { return eyeY() + EYE_H / 2; }
 
 // ── Normal (▬ ▬) ─────────────────────────────────────────────
 void drawNormalEyes(int16_t ox = 0, bool blink = false) {
-  tft.fillScreen(bgColour());
+  fillBg(bgColour());
   const int16_t lx = eyeLX(ox), rx = eyeRX(ox), ey = eyeY();
   if (!blink) {
     tft.fillRect(lx, ey, EYE_W, EYE_H, C_BLACK);
@@ -335,7 +335,7 @@ void drawChevron(int16_t cx, int16_t cy, int16_t arm, int16_t reach,
 }
 
 void drawSquishEyes(bool closed = false) {
-  tft.fillScreen(bgColour());
+  fillBg(bgColour());
   const int16_t lx = eyeLX(0), rx = eyeRX(0), cy = eyeCY();
   const int16_t arm   = EYE_H / 2;
   const int16_t reach = EYE_W / 2;
@@ -359,7 +359,7 @@ void drawSquishEyes(bool closed = false) {
 
 // ── Happy (^_^) ──────────────────────────────────────────────
 void drawHappyEyes(bool squish = false) {
-  tft.fillScreen(bgColour());
+  fillBg(bgColour());
   const int16_t lx = eyeLX(0), rx = eyeRX(0), ey = eyeY();
   const int16_t cy = ey + EYE_H / 2;
   const int16_t r  = EYE_W * 3 / 5;
@@ -401,7 +401,7 @@ void drawHappyEyes(bool squish = false) {
 
 // ── Surprised (O_O) ──────────────────────────────────────────
 void drawSurprisedEyes() {
-  tft.fillScreen(bgColour());
+  fillBg(bgColour());
   const int16_t lx = eyeLX(0), rx = eyeRX(0), ey = eyeY();
   const int16_t cx = EYE_W / 2, cy = EYE_H / 2;
   const int16_t r  = EYE_W * 2 / 5;
@@ -419,7 +419,7 @@ void drawSurprisedEyes() {
 
 // ── Heart (♥_♥) ──────────────────────────────────────────────
 void drawHeartEyes() {
-  tft.fillScreen(bgColour());
+  fillBg(bgColour());
   const int16_t lx = eyeLX(0), rx = eyeRX(0), ey = eyeY();
   const int16_t cy = ey + EYE_H / 2;
   uint16_t hc = heartColour();
@@ -452,7 +452,7 @@ void drawHeartEyes() {
 
 // ── Sleepy (-_-) ─────────────────────────────────────────────
 void drawSleepyEyes(uint8_t closeAmount = 0) {
-  tft.fillScreen(bgColour());
+  fillBg(bgColour());
   const int16_t lx = eyeLX(0), rx = eyeRX(0), ey = eyeY();
   const int16_t cy = ey + EYE_H / 2;
   int16_t lineH = 3 + closeAmount * EYE_H / 2 / 255;
@@ -482,7 +482,7 @@ void drawSleepyEyes(uint8_t closeAmount = 0) {
 
 // ── Wink (;_) ────────────────────────────────────────────────
 void drawWinkEyes(bool leftClosed = false) {
-  tft.fillScreen(bgColour());
+  fillBg(bgColour());
   const int16_t lx = eyeLX(0), rx = eyeRX(0), ey = eyeY();
   const int16_t cy = eyeCY();
 
@@ -511,7 +511,7 @@ void drawWinkEyes(bool leftClosed = false) {
 
 // ── Angry (ಠ_ಠ) ─────────────────────────────────────────────
 void drawAngryEyes() {
-  tft.fillScreen(bgColour());
+  fillBg(bgColour());
   const int16_t lx = eyeLX(0), rx = eyeRX(0), ey = eyeY();
   const int16_t cy = eyeCY();
   uint16_t red = tft.color565(200, 0, 0);
@@ -543,7 +543,7 @@ void drawAngryEyes() {
 
 // ── Cry (;_;) ────────────────────────────────────────────────
 void drawCryEyes() {
-  tft.fillScreen(bgColour());
+  fillBg(bgColour());
   const int16_t lx = eyeLX(0), rx = eyeRX(0), ey = eyeY(), cy = eyeCY();
   uint16_t tearBlue = tft.color565(80, 160, 255);
 
@@ -577,7 +577,7 @@ void drawCryEyes() {
 
 // ── Sweat / Embarrassed (😅) ─────────────────────────────────
 void drawSweatEyes() {
-  tft.fillScreen(bgColour());
+  fillBg(bgColour());
   const int16_t lx = eyeLX(0), rx = eyeRX(0), ey = eyeY(), cy = eyeCY();
   uint16_t sweatBlue = tft.color565(100, 180, 255);
 
@@ -605,7 +605,7 @@ void drawSweatEyes() {
 
 // ── Drool (流口水) ──────────────────────────────────────────
 void drawDroolEyes() {
-  tft.fillScreen(bgColour());
+  fillBg(bgColour());
   const int16_t lx = eyeLX(0), rx = eyeRX(0), ey = eyeY(), cy = eyeCY();
 
   // 迷离半闭眼（向下弯的弧线，像 ^ 但向下）
@@ -639,7 +639,7 @@ void drawDroolEyes() {
 
 // ── Blush / Shy (脸红害羞) ──────────────────────────────────
 void drawBlushEyes() {
-  tft.fillScreen(bgColour());
+  fillBg(bgColour());
   const int16_t lx = eyeLX(0), rx = eyeRX(0), ey = eyeY(), cy = eyeCY();
 
   // 正常大眼睛
@@ -674,8 +674,7 @@ void drawBlushEyes() {
 
 // ── Jealous (😤) ──────────────────────────────────────────────
 void drawJealousEyes() {
-  uint16_t greenBg = tft.color565(200, 230, 200);
-  tft.fillScreen(greenBg);
+  fillBg(bgColour());
   const int16_t lx = eyeLX(0), rx = eyeRX(0), ey = eyeY(), cy = eyeCY();
   uint16_t red = tft.color565(200, 0, 0);
 
@@ -701,7 +700,7 @@ void drawJealousEyes() {
 
 // ── Roll Eyes (🙄) ────────────────────────────────────────────
 void drawRollEyes() {
-  tft.fillScreen(bgColour());
+  fillBg(bgColour());
   const int16_t lx = eyeLX(0), rx = eyeRX(0), ey = eyeY(), cy = eyeCY();
 
   // 白色眼白 + 黑框
@@ -722,7 +721,7 @@ void drawRollEyes() {
 
 // ── Explode (🤯) ─────────────────────────────────────────────
 void drawExplodeEyes() {
-  tft.fillScreen(bgColour());
+  fillBg(bgColour());
   const int16_t lx = eyeLX(0), rx = eyeRX(0), ey = eyeY(), cy = eyeCY();
   uint16_t orange = tft.color565(255, 180, 0);
 
@@ -755,8 +754,7 @@ void drawExplodeEyes() {
 
 // ── Devilish (😈) ─────────────────────────────────────────────
 void drawDevilEyes() {
-  uint16_t purpleBg = tft.color565(160, 120, 190);
-  tft.fillScreen(purpleBg);
+  fillBg(bgColour());
   const int16_t lx = eyeLX(0), rx = eyeRX(0), ey = eyeY(), cy = eyeCY();
   uint16_t red = tft.color565(255, 30, 30);
 
@@ -790,8 +788,7 @@ void drawDevilEyes() {
 
 // ── Sick (🤮) ─────────────────────────────────────────────────
 void drawSickEyes() {
-  uint16_t greenBg = tft.color565(170, 210, 150);
-  tft.fillScreen(greenBg);
+  fillBg(bgColour());
   const int16_t lx = eyeLX(0), rx = eyeRX(0), ey = eyeY(), cy = eyeCY();
   uint16_t greenTint = tft.color565(150, 195, 130);
 
@@ -823,7 +820,7 @@ void initPet() {
 }
 
 void drawPetScene() {
-  tft.fillScreen(tft.color565(255, 200, 150));
+  fillBg(bgColour());
   tft.drawFastHLine(0, 224, DISP_W, tft.color565(200, 100, 70));
   tft.fillRect(0, 225, DISP_W, 15, tft.color565(255, 200, 150));
 
@@ -909,8 +906,7 @@ void updatePet() {
 
 // ── Thinking (🤔) ────────────────────────────────────────────
 void drawThinkingEyes() {
-  uint16_t bg = tft.color565(200, 210, 240);
-  tft.fillScreen(bg);
+  fillBg(bgColour());
   const int16_t lx = eyeLX(0), rx = eyeRX(0), ey = eyeY(), cy = eyeCY();
 
   // 半闭思考眼
@@ -920,8 +916,8 @@ void drawThinkingEyes() {
   // 瞳孔向上看（思考状）
   tft.fillCircle(lx + EYE_W/2, ey + EYE_H/3, 5, C_WHITE);
   tft.fillCircle(rx + EYE_W/2, ey + EYE_H/3, 5, C_WHITE);
-  tft.fillCircle(lx + EYE_W/2 - 2, ey + EYE_H/3 - 2, 2, bg);
-  tft.fillCircle(rx + EYE_W/2 - 2, ey + EYE_H/3 - 2, 2, bg);
+  tft.fillCircle(lx + EYE_W/2 - 2, ey + EYE_H/3 - 2, 2, bgColour());
+  tft.fillCircle(rx + EYE_W/2 - 2, ey + EYE_H/3 - 2, 2, bgColour());
 
   // 思考纹（额头弧线）
   tft.drawLine(95, ey - 12, 105, ey - 18, C_MUTED);
@@ -946,14 +942,13 @@ void updateThinkingEyes() {
 
   // 重绘表情
   const int16_t lx = eyeLX(0), rx = eyeRX(0), ey = eyeY(), cy = eyeCY();
-  uint16_t bg = tft.color565(200, 210, 240);
-  tft.fillScreen(bg);
+  fillBg(bgColour());
   tft.fillRect(lx, ey + 6, EYE_W, EYE_H - 12, C_BLACK);
   tft.fillRect(rx, ey + 6, EYE_W, EYE_H - 12, C_BLACK);
   tft.fillCircle(lx + EYE_W/2, ey + EYE_H/3, 5, C_WHITE);
   tft.fillCircle(rx + EYE_W/2, ey + EYE_H/3, 5, C_WHITE);
-  tft.fillCircle(lx + EYE_W/2 - 2, ey + EYE_H/3 - 2, 2, bg);
-  tft.fillCircle(rx + EYE_W/2 - 2, ey + EYE_H/3 - 2, 2, bg);
+  tft.fillCircle(lx + EYE_W/2 - 2, ey + EYE_H/3 - 2, 2, bgColour());
+  tft.fillCircle(rx + EYE_W/2 - 2, ey + EYE_H/3 - 2, 2, bgColour());
   tft.drawLine(95, ey - 12, 105, ey - 18, C_MUTED);
   tft.drawLine(105, ey - 18, 115, ey - 12, C_MUTED);
   tft.drawLine(105, MOUTH_Y + 3, 120, MOUTH_Y + 6, C_BLACK);
@@ -975,6 +970,10 @@ void updateThinkingEyes() {
 }
 
 // ── Serial Command Handler ───────────────────────────────────
+static void fillBg(uint16_t c) {
+  tft.fillScreen(c);
+}
+
 void drawStatusOverlay() {
   if (statusMsg[0] == '\0') return;
   // 半透明效果用深色半高条代替（ST7789 不支持真正透明）
@@ -1070,9 +1069,9 @@ void updateNormalEyes() {
   // 眨眼间隔从 3s 改为 5s，眨眼动作放慢
   if (millis() - lastAnimMs > 5000) {
     lastAnimMs = millis();
-    drawNormalEyes(0, true);  delay(120);
-    drawNormalEyes(0, false); delay(100);
-    drawNormalEyes(0, true);  delay(120);
+    drawNormalEyes(0, true);  drawStatusOverlay(); delay(120);
+    drawNormalEyes(0, false); drawStatusOverlay(); delay(100);
+    drawNormalEyes(0, true);  drawStatusOverlay(); delay(120);
     drawNormalEyes(0, false);
     return;
   }
@@ -1080,7 +1079,7 @@ void updateNormalEyes() {
     lastAnimMs = millis();
     const int16_t offs[] = {-16, 16, -16, 16, 0};
     for (uint8_t i = 0; i < 5; i++) {
-      drawNormalEyes(offs[i]);
+      drawNormalEyes(offs[i]); drawStatusOverlay();
       delay(80);
     }
   }
@@ -1090,8 +1089,8 @@ void updateSquishEyes() {
   if (millis() - lastAnimMs > 3500) {
     lastAnimMs = millis();
     for (uint8_t i = 0; i < 2; i++) {
-      drawSquishEyes(false); delay(140);
-      drawSquishEyes(true);  delay(100);
+      drawSquishEyes(false); drawStatusOverlay(); delay(140);
+      drawSquishEyes(true);  drawStatusOverlay(); delay(100);
     }
     drawSquishEyes(false);
   }
@@ -1100,9 +1099,9 @@ void updateSquishEyes() {
 void updateHappyEyes() {
   if (millis() - lastAnimMs > 5000) {
     lastAnimMs = millis();
-    drawHappyEyes(true);   delay(200);
-    drawHappyEyes(false);  delay(100);
-    drawHappyEyes(true);   delay(150);
+    drawHappyEyes(true);   drawStatusOverlay(); delay(200);
+    drawHappyEyes(false);  drawStatusOverlay(); delay(100);
+    drawHappyEyes(true);   drawStatusOverlay(); delay(150);
     drawHappyEyes(false);
   }
 }
@@ -1110,12 +1109,12 @@ void updateHappyEyes() {
 void updateSurprisedEyes() {
   if (millis() - lastAnimMs > 3000) {
     lastAnimMs = millis();
-    tft.fillScreen(bgColour());
+    fillBg(bgColour());
     const int16_t lx = eyeLX(0), rx = eyeRX(0), ey = eyeY();
     const int16_t cx = EYE_W / 2, cy = EYE_H / 2;
     tft.fillCircle(lx + cx, ey + cy, EYE_W * 3 / 5, C_BLACK);
     tft.fillCircle(rx + cx, ey + cy, EYE_W * 3 / 5, C_BLACK);
-    delay(120);
+    drawStatusOverlay(); delay(120);
     drawSurprisedEyes();
   }
 }
@@ -1136,7 +1135,7 @@ void updateHeartEyes() {
       tft.fillCircle(hcx - 7, hcy - 2, 8, hc);
       tft.fillCircle(hcx + 7, hcy - 2, 8, hc);
       tft.fillTriangle(hcx - 14, hcy, hcx + 14, hcy, hcx, hcy + 15, hc);
-      delay(60);
+      drawStatusOverlay(); delay(60);
     }
     drawHeartEyes();
   }
@@ -1151,7 +1150,7 @@ void updateSleepyEyes() {
       sleepLevel += 8;
       if (sleepLevel >= 255) {
         waking = true;
-        delay(400);
+        drawStatusOverlay(); delay(400);
       }
     } else {
       sleepLevel -= 20;
@@ -1168,9 +1167,9 @@ void updateSleepyEyes() {
 void updateWinkEyes() {
   if (millis() - lastAnimMs > 2500) {
     lastAnimMs = millis();
-    drawWinkEyes(true);   delay(150);
-    drawWinkEyes(false);  delay(80);
-    drawWinkEyes(true);   delay(100);
+    drawWinkEyes(true);   drawStatusOverlay(); delay(150);
+    drawWinkEyes(false);  drawStatusOverlay(); delay(80);
+    drawWinkEyes(true);   drawStatusOverlay(); delay(100);
     drawWinkEyes(false);
   }
 }
@@ -1179,7 +1178,7 @@ void updateAngryEyes() {
   if (millis() - lastAnimMs > 3000) {
     lastAnimMs = millis();
     for (uint8_t i = 0; i < 4; i++) {
-      drawAngryEyes();
+      drawAngryEyes(); drawStatusOverlay();
       delay(200);
     }
   }
@@ -1189,10 +1188,10 @@ void updateCryEyes() {
   // 眼泪偶尔"刷新"（模拟流泪）
   if (millis() - lastAnimMs > 4000) {
     lastAnimMs = millis();
-    drawCryEyes();
+    drawCryEyes(); drawStatusOverlay();
     delay(150);
     // 再画一遍让眼泪"流下"
-    tft.fillScreen(bgColour());
+    fillBg(bgColour());
     const int16_t lx = eyeLX(0), rx = eyeRX(0), ey = eyeY(), cy = eyeCY();
     uint16_t tearBlue = tft.color565(80, 160, 255);
     for (int8_t t = 0; t < 4; t++) {
@@ -1215,7 +1214,7 @@ void updateCryEyes() {
       tft.drawLine(128, MOUTH_Y - 3 + t, 138, MOUTH_Y + 1 + t, C_BLACK);
       tft.drawLine(138, MOUTH_Y + 1 + t, 142, MOUTH_Y + t, C_BLACK);
     }
-    delay(200);
+    drawStatusOverlay(); delay(200);
     drawCryEyes();
   }
 }
@@ -1261,7 +1260,7 @@ void updateRollEyes() {
 void updateExplodeEyes() {
   if (millis() - lastAnimMs > 2000) {
     lastAnimMs = millis();
-    drawExplodeEyes();
+    drawExplodeEyes(); drawStatusOverlay();
     delay(150);
     drawExplodeEyes();
   }
@@ -1390,7 +1389,7 @@ void setup() {
 
   startupMs = millis();
 
-  tft.fillScreen(bgColour());
+  fillBg(bgColour());
   tft.setTextColor(C_WHITE); tft.setTextSize(3);
   tft.setCursor(DISP_W / 2 - 54, DISP_H / 2 - 22); tft.print("Clawd");
   tft.setCursor(DISP_W / 2 - 54, DISP_H / 2 + 14); tft.print("Mochi");
