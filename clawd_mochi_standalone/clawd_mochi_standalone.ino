@@ -222,7 +222,7 @@ void setBacklight(bool on) {
 }
 
 void initColours() {
-  C_ORANGE = tft.color565(255, 140, 40);
+  C_ORANGE = tft.color565(218, 17, 0);
   C_DARKBG = tft.color565(10,  12,  16);
   C_MUTED  = tft.color565(90,  88,  86);
   C_GREEN  = tft.color565(80, 220, 130);
@@ -723,7 +723,7 @@ void drawRollEyes() {
 void drawExplodeEyes() {
   fillBg(bgColour());
   const int16_t lx = eyeLX(0), rx = eyeRX(0), ey = eyeY(), cy = eyeCY();
-  uint16_t orange = tft.color565(255, 180, 0);
+  uint16_t orange = tft.color565(200, 30, 0);
 
   // 放射爆炸线
   for (uint8_t i = 0; i < 10; i++) {
